@@ -6,35 +6,42 @@
   <title>面接予約登録 | Agendamento de Entrevista</title>
   <link rel="icon" href="jobsjapan.png" type="image/png">
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #e0eaff, #ffffff);
+      margin: 0;
+      padding: 20px;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       min-height: 100vh;
-      margin: 0;
     }
 
     .form-container {
       background: #fff;
-      padding: 30px;
-      border-radius: 16px;
-      width: 100%;
+      padding: 25px;
+      border-radius: 14px;
       max-width: 500px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      width: 100%;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
     }
 
     h2 {
       text-align: center;
+      margin-bottom: 20px;
       color: #2c3e50;
     }
 
     label {
       display: block;
-      margin-top: 14px;
+      margin-top: 16px;
       color: #34495e;
       font-weight: bold;
+      font-size: 14px;
     }
 
     input[type="text"],
@@ -57,13 +64,14 @@
 
     .radio-group label {
       font-weight: normal;
+      font-size: 14px;
       display: block;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
 
     button {
-      margin-top: 24px;
-      padding: 14px;
+      margin-top: 30px;
+      padding: 15px;
       background: linear-gradient(to right, #4a90e2, #007aff);
       border: none;
       border-radius: 12px;
@@ -71,14 +79,35 @@
       font-size: 16px;
       cursor: pointer;
       width: 100%;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      transition: background 0.3s;
     }
 
     button:hover {
       background: linear-gradient(to right, #3b7ddb, #006ae0);
     }
+
+    @media (max-width: 480px) {
+      .form-container {
+        padding: 20px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+    }
   </style>
 
   <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const dataHoraFields = document.getElementById("data-hora");
+      document.querySelectorAll('input[name="modo"]').forEach((el) => {
+        el.addEventListener("change", function() {
+          dataHoraFields.style.display = this.value === "agendar" ? "block" : "none";
+        });
+      });
+    });
+
     async function handleSubmit(e) {
       e.preventDefault();
 
@@ -89,26 +118,16 @@
       const city = document.getElementById("city").value;
       const car = document.querySelector('input[name="car"]:checked').value;
       const japanese = document.querySelector('input[name="japanese"]:checked').value;
-      const date = document.getElementById("date").value;
-      const time = document.getElementById("time").value;
+      const modo = document.querySelector('input[name="modo"]:checked').value;
 
-      const fullDatetime = new Date(`${date}T${time}`);
-      const now = new Date();
-      const diff = (fullDatetime - now) / (1000 * 60); // em minutos
+      let date = '';
+      let time = '';
 
-      // 1. Buscar status do painel no JSONBin
-      let disponivel = false;
-      await fetch("https://api.jsonbin.io/v3/b/684277898561e97a5020346c", {
-        headers: {
-          "X-Master-Key": "$2a$10$fYX1tWsJ/Op2W7oSjb8FnOCRGVujCKYElfZxvXzQWBVLN1QkbXboi"
-        }
-      })
-      .then(res => res.json())
-      .then(data => {
-        disponivel = data.record.disponivel;
-      });
+      if (modo === "agendar") {
+        date = document.getElementById("date").value;
+        time = document.getElementById("time").value;
+      }
 
-      // 2. Envia os dados para Google Sheets
       await fetch("https://script.google.com/macros/s/AKfycbxgEuqK-OjQCKwCShZBi8Gm0YJE1IwEcH_k451608eoAeSEA6sNpT3iw4I8VB7r86SC/exec", {
         method: "POST",
         body: new URLSearchParams({
@@ -116,8 +135,18 @@
         })
       });
 
-      // 3. Redirecionamento com base na disponibilidade
-      if (diff <= 10) {
+      if (modo === "agora") {
+        let disponivel = false;
+        await fetch("https://api.jsonbin.io/v3/b/684277898561e97a5020346c", {
+          headers: {
+            "X-Master-Key": "$2a$10$fYX1tWsJ/Op2W7oSjb8FnOCRGVujCKYElfZxvXzQWBVLN1QkbXboi"
+          }
+        })
+        .then(res => res.json())
+        .then(data => {
+          disponivel = data.record.disponivel;
+        });
+
         if (disponivel) {
           window.location.href = "https://meet.google.com/sym-fhub-czn";
         } else {
@@ -158,8 +187,15 @@
         <label><input type="radio" name="japanese" value="SOMENTE CUMPRIMENTOS" required> Cumprimentos básicos</label>
         <label><input type="radio" name="japanese" value="NÃO ENTENDO NADA" required> Não entende nada</label>
       </div>
-      <label>面接希望日 / Data da entrevista:<br><input type="date" id="date" required></label>
-      <label>面接希望時間 / Horário da entrevista:<br><input type="time" id="time" required></label>
+      <label>面接希望方法 / Como deseja fazer a entrevista:</label>
+      <div class="radio-group">
+        <label><input type="radio" name="modo" value="agora" required> 今すぐ面接したい / Entrevista agora</label>
+        <label><input type="radio" name="modo" value="agendar" required> 別の日を予約したい / Agendar outro dia</label>
+      </div>
+      <div id="data-hora" style="display: none;">
+        <label>面接希望日 / Data da entrevista:<br><input type="date" id="date"></label>
+        <label>面接希望時間 / Horário da entrevista:<br><input type="time" id="time"></label>
+      </div>
       <button type="submit">送信 / Enviar</button>
     </form>
   </div>
