@@ -60,8 +60,8 @@
   </div>
 
   <script>
-    const binUrl = 'SUA_API_DO_JSONBIN'; // substitua aqui pelo seu link da API JSONBin
-    const apiKey = 'SUA_CHAVE_API_DO_JSONBIN'; // você pega nas configurações da sua conta
+    const binUrl = 'https://api.jsonbin.io/v3/b/684277898561e97a5020346c';
+    const apiKey = '$2a$10$fYX1tWsJ/Op2W7oSjb8FnOCRGVujCKYElfZxvXzQWBVLN1QkbXboi';
 
     async function setStatus(value) {
       const res = await fetch(binUrl, {
@@ -72,7 +72,7 @@
         },
         body: JSON.stringify({ disponivel: value })
       });
-      document.getElementById("status").innerText = `Status atualizado: ${value ? 'DISPONÍVEL' : 'INDISPONÍVEL'}`;
+      document.getElementById("status").innerText = `Status atualizado: ${value ? '✅ DISPONÍVEL' : '❌ INDISPONÍVEL'}`;
     }
 
     async function getStatus() {
@@ -80,7 +80,7 @@
         headers: { "X-Master-Key": apiKey }
       });
       const data = await res.json();
-      document.getElementById("status").innerText = `Status atual: ${data.record.disponivel ? 'DISPONÍVEL' : 'INDISPONÍVEL'}`;
+      document.getElementById("status").innerText = `Status atual: ${data.record.disponivel ? '✅ DISPONÍVEL' : '❌ INDISPONÍVEL'}`;
     }
 
     getStatus();
