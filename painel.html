@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel de Disponibilidade</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #eef3f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    .box {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 15px 25px;
+      margin: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      color: white;
+    }
+
+    .on {
+      background: #28a745;
+    }
+
+    .off {
+      background: #dc3545;
+    }
+
+    #status {
+      margin-top: 20px;
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h1>Painel de Disponibilidade</h1>
+    <button class="on" onclick="setStatus(true)">✅ Estou disponível</button>
+    <button class="off" onclick="setStatus(false)">❌ Não estou disponível</button>
+    <p id="status">Status atual: carregando...</p>
+  </div>
+
+  <script>
+    const binUrl = 'SUA_API_DO_JSONBIN'; // substitua aqui pelo seu link da API JSONBin
+    const apiKey = 'SUA_CHAVE_API_DO_JSONBIN'; // você pega nas configurações da sua conta
+
+    async function setStatus(value) {
+      const res = await fetch(binUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Master-Key": apiKey
+        },
+        body: JSON.stringify({ disponivel: value })
+      });
+      document.getElementById("status").innerText = `Status atualizado: ${value ? 'DISPONÍVEL' : 'INDISPONÍVEL'}`;
+    }
+
+    async function getStatus() {
+      const res = await fetch(binUrl, {
+        headers: { "X-Master-Key": apiKey }
+      });
+      const data = await res.json();
+      document.getElementById("status").innerText = `Status atual: ${data.record.disponivel ? 'DISPONÍVEL' : 'INDISPONÍVEL'}`;
+    }
+
+    getStatus();
+  </script>
+</body>
+</html>
