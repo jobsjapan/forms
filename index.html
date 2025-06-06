@@ -103,7 +103,16 @@
         })
       });
 
-      const disponivel = false; // ✅ Coloque true manualmente quando você estiver disponível
+      let disponivel = false;
+
+await fetch("SUA_API_DO_JSONBIN", {
+  headers: { "X-Master-Key": "SUA_CHAVE_API_DO_JSONBIN" }
+})
+.then(res => res.json())
+.then(data => {
+  disponivel = data.record.disponivel;
+});
+
 
       if (diff <= 10) {
         if (disponivel) {
