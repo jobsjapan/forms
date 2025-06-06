@@ -1,21 +1,19 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>面接予約登録 | Agendamento de Entrevista</title>
+  <link rel="icon" href="jobsjapan.png" type="image/png">
   <style>
-    * { box-sizing: border-box; }
-
     body {
-      margin: 0;
-      padding: 0;
       font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(135deg, #e0eaff, #ffffff);
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      margin: 0;
     }
 
     .form-container {
@@ -23,19 +21,12 @@
       padding: 30px;
       border-radius: 16px;
       width: 100%;
-      max-width: 480px;
+      max-width: 500px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-      transform: perspective(1000px) rotateX(0deg);
-      transition: all 0.4s ease;
-    }
-
-    .form-container:hover {
-      transform: perspective(1000px) rotateX(1deg);
     }
 
     h2 {
       text-align: center;
-      margin-bottom: 20px;
       color: #2c3e50;
     }
 
@@ -57,7 +48,6 @@
       border: 1px solid #ccc;
       border-radius: 10px;
       font-size: 15px;
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .radio-group {
@@ -79,29 +69,12 @@
       border-radius: 12px;
       color: white;
       font-size: 16px;
-      font-weight: bold;
       cursor: pointer;
       width: 100%;
-      box-shadow: 0 4px 12px rgba(0, 122, 255, 0.4);
-      transition: background 0.3s ease;
     }
 
     button:hover {
       background: linear-gradient(to right, #3b7ddb, #006ae0);
-    }
-
-    @media (max-width: 480px) {
-      .form-container {
-        padding: 20px;
-      }
-
-      input, button {
-        font-size: 14px;
-      }
-
-      h2 {
-        font-size: 20px;
-      }
     }
   </style>
 
@@ -121,6 +94,7 @@
 
       const fullDatetime = new Date(`${date}T${time}`);
       const now = new Date();
+      const diff = (fullDatetime - now) / (1000 * 60); // em minutos
 
       await fetch("https://script.google.com/macros/s/AKfycbxgEuqK-OjQCKwCShZBi8Gm0YJE1IwEcH_k451608eoAeSEA6sNpT3iw4I8VB7r86SC/exec", {
         method: "POST",
@@ -129,14 +103,14 @@
         })
       });
 
-      const diff = (fullDatetime - now) / (1000 * 60);
-      const disponivel = true; // ✅ Altere manualmente: true = você está disponível agora
+      const disponivel = false; // ✅ Coloque true manualmente quando você estiver disponível
 
-      if (diff <= 10 && !disponivel) {
-        const msg = encodeURIComponent("Gostaria de marcar entrevista agora. Quando posso comparecer?");
-        window.location.href = `https://wa.me/818042170582?text=${msg}`;
-      } else if (diff <= 10 && disponivel) {
-        window.location.href = "https://meet.google.com/sym-fhub-czn";
+      if (diff <= 10) {
+        if (disponivel) {
+          window.location.href = "https://meet.google.com/sym-fhub-czn";
+        } else {
+          window.location.href = "aguarde.html";
+        }
       } else {
         window.location.href = "confirmacao.html";
       }
@@ -145,7 +119,7 @@
 </head>
 <body>
   <div class="form-container">
-    <h2>面接予約登録<br><small>/ Agendamento de Entrevista</small></h2>
+    <h2>面接予約登録 / Agendamento de Entrevista</h2>
     <form onsubmit="handleSubmit(event)">
       <label>氏名 / Nome:<br><input type="text" id="name" required></label>
       <label>年齢 / Idade:<br><input type="number" id="age" required></label>
@@ -158,19 +132,19 @@
       <label>住まい / Cidade onde mora:<br><input type="text" id="city" required></label>
       <label>軽バン（配達用車） / Veículo:</label>
       <div class="radio-group">
-        <label><input type="radio" name="car" value="会社のリースが必要" required> 会社のリースが必要 / Precisa de carro da empresa</label>
-        <label><input type="radio" name="car" value="自分の軽バンを使います" required> 自分の軽バンを使います / Usará seu próprio carro</label>
+        <label><input type="radio" name="car" value="会社のリースが必要" required> Precisa de leasing</label>
+        <label><input type="radio" name="car" value="自分の軽バンを使います" required> Usará carro próprio</label>
       </div>
       <label>日本語レベル / Nível de Japonês:</label>
       <div class="radio-group">
         <label><input type="radio" name="japanese" value="日本人と同等の読み書き" required> 日本人と同等の読み書き</label>
-        <label><input type="radio" name="japanese" value="CONVERSAÇÃO FLUENTE E LEITURA DE ALGUNS KANJIS" required> Conversação fluente e leitura de alguns kanji’s</label>
+        <label><input type="radio" name="japanese" value="CONVERSAÇÃO FLUENTE E LEITURA DE ALGUNS KANJIS" required> Conversação fluente</label>
         <label><input type="radio" name="japanese" value="CONVERSAÇÃO COTIDIANA" required> Conversação cotidiana</label>
         <label><input type="radio" name="japanese" value="CONVERSAÇÃO BÁSICA" required> Conversação básica</label>
-        <label><input type="radio" name="japanese" value="CONSIGO RESPONDER PERGUNTAS FEITAS" required> Consigo responder perguntas feitas</label>
-        <label><input type="radio" name="japanese" value="ENTENDO MAS NÃO CONSIGO RESPONDER" required> Entendo mas não consigo responder</label>
-        <label><input type="radio" name="japanese" value="SOMENTE CUMPRIMENTOS" required> Somente cumprimentos</label>
-        <label><input type="radio" name="japanese" value="NÃO ENTENDO NADA" required> Não entendo nada</label>
+        <label><input type="radio" name="japanese" value="CONSIGO RESPONDER PERGUNTAS FEITAS" required> Responde perguntas</label>
+        <label><input type="radio" name="japanese" value="ENTENDO MAS NÃO CONSIGO RESPONDER" required> Entende, mas não responde</label>
+        <label><input type="radio" name="japanese" value="SOMENTE CUMPRIMENTOS" required> Cumprimentos básicos</label>
+        <label><input type="radio" name="japanese" value="NÃO ENTENDO NADA" required> Não entende nada</label>
       </div>
       <label>面接希望日 / Data da entrevista:<br><input type="date" id="date" required></label>
       <label>面接希望時間 / Horário da entrevista:<br><input type="time" id="time" required></label>
